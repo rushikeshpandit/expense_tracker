@@ -1,33 +1,52 @@
 package com.rushikesh.expense_tracker.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
-@Document(collection = "expensestypes")
-public class ExpensesType {
+@Entity
+@Table(name = "expenses_type")
+public class ExpensesType extends Audit {
+	
+	public ExpensesType() {
+	}
 	
 	@Id
-	private Integer id;
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 	
 	@NotBlank
+	@Column(name = "expenses_type_name", nullable = false)
 	private String expenseTypeName;
 
+	@OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", nullable = false)
+    @JsonIgnore
 	private Users user;
 
-	public ExpensesType(Integer id, String expenseTypeName, Users user) {
+	public ExpensesType(Long id, String expenseTypeName, Users user) {
 		super();
 		this.id = id;
 		this.expenseTypeName = expenseTypeName;
 		this.user = user;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

@@ -2,29 +2,49 @@ package com.rushikesh.expense_tracker.model;
 
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
-@Document(collection = "accounts")
-public class Accounts {
-	
-	protected Accounts() {
+@Entity
+@Table(name = "accounts")
+public class Accounts extends Audit {
 
+	public Accounts() {
 	}
-
+	
 	@Id
-	private Integer id;
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@Column(name = "account_id", nullable = false)
+	private Long id;
 	
 	@NotBlank
+	@Column(name = "account_name", nullable = false)
 	private String name;
 	
+	@OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
 	private Users user;
 	
+	@OneToMany(mappedBy = "id")
+//	@ElementCollection(targetClass=Expenses.class)
+	@JsonIgnore
 	private List<Expenses> expenses;
 
-	public Accounts(Integer id, String name, Users user, List<Expenses> expenses) {
+	public Accounts(Long id, String name, Users user, List<Expenses> expenses) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -32,11 +52,11 @@ public class Accounts {
 		this.expenses = expenses;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

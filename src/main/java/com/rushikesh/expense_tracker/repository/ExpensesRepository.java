@@ -1,9 +1,9 @@
 package com.rushikesh.expense_tracker.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.rushikesh.expense_tracker.model.Expenses;
 
 
-public interface ExpensesRepository extends MongoRepository<Expenses, Integer>{
+public interface ExpensesRepository extends JpaRepository<Expenses, Integer>{
 }

@@ -8,13 +8,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
   info = @Info(
-  title = "Code-First Approach (reflectoring.io)",
-  description = "" +
-    "Lorem ipsum dolor ...",
+  title = "Expenses Tracker by Rushikesh Pandit",
+  description = "These API's are useful for tracking user's expenses",
   contact = @Contact(
-    name = "Reflectoring", 
-    url = "https://reflectoring.io", 
-    email = "petros.stergioulas94@gmail.com"
+    name = "Rushikesh Pandit", 
+    url = "http://rp-portfolio.s3-website.ap-south-1.amazonaws.com/", 
+    email = "rushikesh.d.pandit@gmail.com"
   ),
   license = @License(
     name = "MIT Licence", 

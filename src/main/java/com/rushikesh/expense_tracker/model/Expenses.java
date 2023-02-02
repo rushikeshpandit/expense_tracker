@@ -1,34 +1,57 @@
 package com.rushikesh.expense_tracker.model;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 
-@Document(collection = "expenses")
-public class Expenses {
+@Entity
+@Table(name = "expenses")
+public class Expenses extends Audit {
 	
+	public Expenses() {
+	}
 	@Id
-	private Integer id;
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@Column(name = "expense_id", nullable = false)
+    private Long id;
 	
+	@Column(name = "expense_description", nullable = false)
 	private String description;
 	
 	@PositiveOrZero
+	@Column(name = "expense_amount", nullable = false)
 	private Long amount;
 	
+	@OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
 	private Users user;
 	
+	@OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expense_type_id", nullable = false)
+    @JsonIgnore
 	private ExpensesType expenseType;
 
+//	@OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", nullable = false)
+    @JsonIgnore
+//	@Column(name = "expense_id", nullable = false)
 	private Accounts account;
-	
-	private Date  createAt;
 
-	public Expenses(Integer id, String description, Long amount, @Valid Users user,
-			@Valid ExpensesType expenseType,@Valid Accounts account,  Date createAt) {
+	public Expenses(Long id, String description, Long amount, @Valid Users user,
+			@Valid ExpensesType expenseType,@Valid Accounts account) {
 		super();
 		this.id = id;
 		this.description = description;
@@ -36,14 +59,13 @@ public class Expenses {
 		this.user = user;
 		this.expenseType = expenseType;
 		this.account = account;
-		this.createAt = createAt;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -86,14 +108,4 @@ public class Expenses {
 	public void setAccount(Accounts account) {
 		this.account = account;
 	}
-
-	public Date getCreateAt() {
-		return createAt;
-	}
-
-	public void setCreateAt(Date createAt) {
-		this.createAt = createAt;
-	}
-	
-	
 }
