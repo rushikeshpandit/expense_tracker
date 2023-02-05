@@ -2,18 +2,20 @@ package com.rushikesh.expense_tracker.model;
 
 import java.util.List;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
@@ -23,41 +25,41 @@ public class Accounts extends Audit {
 
 	public Accounts() {
 	}
-	
+
 	@Id
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	@Column(name = "account_id", nullable = false)
-	private Long id;
-	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long accountId;
+
 	@NotBlank
 	@Column(name = "account_name", nullable = false)
 	private String name;
-	
-	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "users_id", referencedColumnName = "usersId")
+	@JsonIgnoreProperties("accounts")
+	@JsonIgnore
 	private Users user;
-	
-	@OneToMany(mappedBy = "id")
-//	@ElementCollection(targetClass=Expenses.class)
+
+	@ElementCollection(targetClass=Expenses.class)	
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "account", cascade = CascadeType.ALL)
+	@JsonIgnoreProperties("account")
 	@JsonIgnore
 	private List<Expenses> expenses;
 
 	public Accounts(Long id, String name, Users user, List<Expenses> expenses) {
 		super();
-		this.id = id;
+		this.accountId = id;
 		this.name = name;
 		this.user = user;
 		this.expenses = expenses;
 	}
 
 	public Long getId() {
-		return id;
+		return accountId;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.accountId = id;
 	}
 
 	public String getName() {
@@ -83,6 +85,5 @@ public class Accounts extends Audit {
 	public void setExpenses(List<Expenses> expenses) {
 		this.expenses = expenses;
 	}
-	
-	
+
 }

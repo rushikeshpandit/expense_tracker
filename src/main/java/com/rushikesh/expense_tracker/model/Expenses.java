@@ -1,7 +1,9 @@
 package com.rushikesh.expense_tracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,9 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -19,41 +20,41 @@ import jakarta.validation.constraints.PositiveOrZero;
 @Entity
 @Table(name = "expenses")
 public class Expenses extends Audit {
-	
+
 	public Expenses() {
 	}
+
 	@Id
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	@Column(name = "expense_id", nullable = false)
-    private Long id;
-	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long expensesId;
+
 	@Column(name = "expense_description", nullable = false)
 	private String description;
-	
+
 	@PositiveOrZero
 	@Column(name = "expense_amount", nullable = false)
 	private Long amount;
-	
+
 	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
+	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnore
 	private Users user;
-	
+
 	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "expense_type_id", nullable = false)
-    @JsonIgnore
+	@JoinColumn(name = "expense_type_id", nullable = false)
+	@JsonIgnore
 	private ExpensesType expenseType;
 
-//	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", nullable = false)
-    @JsonIgnore
-//	@Column(name = "expense_id", nullable = false)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "accounts_id", referencedColumnName = "accountId")
+	@JsonIgnoreProperties("expenses")
+	@JsonIgnore
 	private Accounts account;
 
 	public Expenses(Long id, String description, Long amount, @Valid Users user,
 			@Valid ExpensesType expenseType,@Valid Accounts account) {
 		super();
-		this.id = id;
+		this.expensesId = id;
 		this.description = description;
 		this.amount = amount;
 		this.user = user;
@@ -62,11 +63,11 @@ public class Expenses extends Audit {
 	}
 
 	public Long getId() {
-		return id;
+		return expensesId;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.expensesId = id;
 	}
 
 	public String getDescription() {
@@ -108,4 +109,5 @@ public class Expenses extends Audit {
 	public void setAccount(Accounts account) {
 		this.account = account;
 	}
+
 }

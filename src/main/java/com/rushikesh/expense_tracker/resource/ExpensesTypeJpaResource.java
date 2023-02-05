@@ -1,6 +1,6 @@
 package com.rushikesh.expense_tracker.resource;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,41 +25,42 @@ public class ExpensesTypeJpaResource {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@GetMapping("/users/{userId}/expensestype")
-	public List<ExpensesType> retrieveExpensesTypes(@PathVariable int userId,
+	public Collection<ExpensesType> retrieveExpensesTypes(@PathVariable int userId,
 			@PathVariable int expensesId) {
 		Optional<Users> user = userRepository.findById(userId);
-		
+
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
-		
+
 		return user.get().getExpensesType();
 	}
-	
+
 	@PostMapping("/users/{userId}/expensestype")
-	public List<ExpensesType> createExpensesType(@PathVariable int userId, @Valid @RequestBody ExpensesType expensesType) {
+	public Collection<ExpensesType> createExpensesType(@PathVariable int userId, @Valid @RequestBody ExpensesType expensesType) {
 		Optional<Users> user = userRepository.findById(userId);
-		
+
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
-		
-		List<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
-		
+
+		Collection<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
+
 		user.get().setExpensesType(existingExpensesTypes);
 		return user.get().getExpensesType();
-		
+
 	}
-	
-	@PutMapping("/users/{userId}/expensesType/")
-	public List<ExpensesType> updateExpenseType(@PathVariable int userId, @Valid @RequestBody List<ExpensesType> expensesTypes) {
+
+	@PutMapping("/users/{userId}/expensesType")
+	public Collection<ExpensesType> updateExpenseType(@PathVariable int userId, @Valid @RequestBody Collection<ExpensesType> expensesTypes) {
 		Optional<Users> user = userRepository.findById(userId);
-		
+
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
-		
+
 		user.get().setExpensesType(expensesTypes);
-		
+
 		return user.get().getExpensesType();
 	}
+
 }

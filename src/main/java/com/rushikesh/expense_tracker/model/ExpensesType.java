@@ -1,8 +1,9 @@
 package com.rushikesh.expense_tracker.model;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,44 +11,43 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "expenses_type")
 public class ExpensesType extends Audit {
-	
+
 	public ExpensesType() {
 	}
-	
+
 	@Id
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long expensesTypeId;
+
 	@NotBlank
 	@Column(name = "expenses_type_name", nullable = false)
 	private String expenseTypeName;
 
-	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", nullable = false)
-    @JsonIgnore
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "users_id", referencedColumnName = "usersId")
+	@JsonIgnoreProperties("expensesType")
 	private Users user;
 
 	public ExpensesType(Long id, String expenseTypeName, Users user) {
 		super();
-		this.id = id;
+		this.expensesTypeId = id;
 		this.expenseTypeName = expenseTypeName;
 		this.user = user;
 	}
 
 	public Long getId() {
-		return id;
+		return expensesTypeId;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.expensesTypeId = id;
 	}
 
 	public String getExpenseTypeName() {
@@ -65,4 +65,5 @@ public class ExpensesType extends Audit {
 	public void setUser(Users user) {
 		this.user = user;
 	}
+
 }

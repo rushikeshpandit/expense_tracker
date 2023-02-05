@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping(path = "/api")
 public class ExpensesJpaResource {
-	
+
 	@Autowired
 	private ExpensesRepository expensesRepository;
 	@Autowired
@@ -38,29 +38,29 @@ public class ExpensesJpaResource {
 	private AccountsRepository accountsRepository;
 	@Autowired
 	private ExpensesTypeRepository expensesTypeRepository;
-	
-	
+
+
 	@GetMapping("/users/{userId}/accounts/{accountId}/expenses")
 	public List<Expenses> retrieveExpenses(@PathVariable int userId, @PathVariable int accountId) {
 		Optional<Users> user = userRepository.findById(userId);
-		
+
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
-		
+
 
 		Optional<Accounts> fetchedAccount = accountsRepository.findById(accountId);
-		
+
 		if(fetchedAccount.isEmpty())
 			throw new AccountNotFoundException("id:"+accountId);
-		
+
 		Boolean shouldReturn = false;
-		
+
 		for(Accounts account: user.get().getAccounts()) {
-            if(account.getId().equals(fetchedAccount.get().getId())) {
-            	shouldReturn = true;
-                break;
-            }
-        }
+			if(account.getId().equals(fetchedAccount.get().getId())) {
+				shouldReturn = true;
+				break;
+			}
+		}
 		if (shouldReturn) {
 			return fetchedAccount.get().getExpenses();
 		} else {
@@ -70,28 +70,29 @@ public class ExpensesJpaResource {
 
 	@PostMapping("/users/{userId}/accounts/{accountId}/expenses/{expensesTypeId}")
 	public Expenses createExpense(@PathVariable int userId, @PathVariable int accountId, @PathVariable int expensesTypeId,
-			 @Valid @RequestBody Expenses expenses) {
-		
+			@Valid @RequestBody Expenses expenses) {
+
 		Optional<Users> user = userRepository.findById(userId);
-		
+
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
-		
+
 		Optional<Accounts> fetchedAccount = accountsRepository.findById(accountId);
-		
+
 		if(fetchedAccount.isEmpty())
 			throw new AccountNotFoundException("id:"+accountId);
-		
+
 		Optional<ExpensesType> fetchedExpensesType = expensesTypeRepository.findById(expensesTypeId);
-		
+
 		if(fetchedExpensesType.isEmpty())
 			throw new ExpensesTypeNotFoundException("id:"+expensesTypeId);
-		
+
 		expenses.setUser(user.get());
 		expenses.setAccount(fetchedAccount.get());
 		expenses.setExpenseType(fetchedExpensesType.get());
-		
+
 		Expenses savedExpenses = expensesRepository.save(expenses);
 		return savedExpenses;
 	}
+
 }

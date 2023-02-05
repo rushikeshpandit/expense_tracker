@@ -1,7 +1,7 @@
-package com.rushikesh.expense_tracker.repository;
+package com.rushikesh.expense_tracker.payload.response;
 
 public class ServiceResponse {
-	
+
 	private Object returnObject;
 	private String errorMessage;
 	private String status;

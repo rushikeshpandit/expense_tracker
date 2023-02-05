@@ -19,7 +19,7 @@ public class ExpenseTrackerApplication {
 	public void init(){
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));   // It will set UTC timezone
 	}
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(ExpenseTrackerApplication.class, args);
 	}
@@ -29,8 +29,8 @@ public class ExpenseTrackerApplication {
 		return new WebMvcConfigurer() {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-					.allowedMethods("*")
-					.allowedOrigins("*");//#CHANGE //NOT RECOMMENDED FOR PRODUCTION
+				.allowedMethods("*")
+				.allowedOrigins("*");//#CHANGE //NOT RECOMMENDED FOR PRODUCTION
 			}
 		};
 	}
