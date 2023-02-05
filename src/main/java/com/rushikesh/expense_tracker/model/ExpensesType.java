@@ -1,6 +1,7 @@
 package com.rushikesh.expense_tracker.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
@@ -33,6 +34,7 @@ public class ExpensesType extends Audit {
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "users_id", referencedColumnName = "usersId")
 	@JsonIgnoreProperties("expensesType")
+	@JsonIgnore
 	private Users user;
 
 	public ExpensesType(Long id, String expenseTypeName, Users user) {
