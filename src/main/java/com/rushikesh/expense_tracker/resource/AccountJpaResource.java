@@ -63,10 +63,6 @@ public class AccountJpaResource {
 
 		accountRepository.save(account);
 
-		//		user.get().setAccounts(existingAccounts);
-
-		//		userRepository.save(user.get());
-
 		Collection<Accounts> updatedAccounts = user.get().getAccounts();
 
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
@@ -77,15 +73,32 @@ public class AccountJpaResource {
 	}
 
 	@PutMapping("/users/{userId}/accounts")
-	public Collection<Accounts> updateAccounts(@PathVariable int userId, @Valid @RequestBody Collection<Accounts> accounts) {
+	public ResponseEntity<?> updateAccounts(@PathVariable int userId, @Valid @RequestBody Accounts accounts) {
+		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userId);
 
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
 
-		user.get().setAccounts(accounts);
+		Collection<Accounts> existingAccounts = user.get().getAccounts();
 
-		return user.get().getAccounts();
+		existingAccounts.forEach(existingAccount -> {
+			if (existingAccount.getId().longValue() == accounts.getId().longValue()) {
+				existingAccount.setName(accounts.getName());
+			}
+		});
+
+		user.get().setAccounts(existingAccounts);
+
+		userRepository.save(user.get());
+
+		Collection<Accounts> updatedAccounts = user.get().getAccounts();
+		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
+		response.setReturnObject(updatedAccounts);
+
+		return ResponseEntity
+				.ok()
+				.body(response);
 	}
 
 }
