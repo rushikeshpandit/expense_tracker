@@ -60,26 +60,42 @@ public class ExpensesTypeJpaResource {
 		existingExpensesTypes.add(expensesType);
 		expensesTypeRepository.save(expensesType);
 
-		Collection<ExpensesType> updatedExpensesTypes = user.get().getExpensesType();
-
-
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
-		response.setReturnObject(updatedExpensesTypes);
+		response.setReturnObject(existingExpensesTypes);
 		return ResponseEntity
 				.ok()
 				.body(response);
 	}
 
 	@PutMapping("/users/{userId}/expensesType")
-	public Collection<ExpensesType> updateExpenseType(@PathVariable int userId, @Valid @RequestBody Collection<ExpensesType> expensesTypes) {
+	public ResponseEntity<?>  updateExpenseType(@PathVariable int userId, @Valid @RequestBody ExpensesType expensesTypes) {
+
+		ServiceResponse response = new ServiceResponse();
+
 		Optional<Users> user = userRepository.findById(userId);
 
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
 
-		user.get().setExpensesType(expensesTypes);
+		Collection<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
 
-		return user.get().getExpensesType();
+		existingExpensesTypes.forEach(existingExpensesType -> {
+			if (existingExpensesType.getId().longValue() == expensesTypes.getId().longValue()) {
+				existingExpensesType.setExpenseTypeName(expensesTypes.getExpenseTypeName());
+			}
+		});
+
+
+		user.get().setExpensesType(existingExpensesTypes);
+
+		userRepository.save(user.get());
+
+		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
+		response.setReturnObject(existingExpensesTypes);
+
+		return ResponseEntity
+				.ok()
+				.body(response);
 	}
 
 }

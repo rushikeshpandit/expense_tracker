@@ -63,10 +63,8 @@ public class AccountJpaResource {
 
 		accountRepository.save(account);
 
-		Collection<Accounts> updatedAccounts = user.get().getAccounts();
-
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
-		response.setReturnObject(updatedAccounts);
+		response.setReturnObject(existingAccounts);
 		return ResponseEntity
 				.ok()
 				.body(response);
@@ -92,9 +90,8 @@ public class AccountJpaResource {
 
 		userRepository.save(user.get());
 
-		Collection<Accounts> updatedAccounts = user.get().getAccounts();
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
-		response.setReturnObject(updatedAccounts);
+		response.setReturnObject(existingAccounts);
 
 		return ResponseEntity
 				.ok()
