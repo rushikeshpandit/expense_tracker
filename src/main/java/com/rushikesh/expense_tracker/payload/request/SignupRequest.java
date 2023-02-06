@@ -1,6 +1,6 @@
 package com.rushikesh.expense_tracker.payload.request;
 
-import java.util.Set;
+import java.util.List;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +16,7 @@ public class SignupRequest {
 	@Email
 	private String email;
 
-	private Set<String> roles;
+	private List<String> roles;
 
 	@NotBlank
 	@Size(min = 6, max = 40)
@@ -46,11 +46,11 @@ public class SignupRequest {
 		this.password = password;
 	}
 
-	public Set<String> getRoles() {
+	public List<String> getRoles() {
 		return this.roles;
 	}
 
-	public void setRole(Set<String> roles) {
+	public void setRole(List<String> roles) {
 		this.roles = roles;
 	}
 

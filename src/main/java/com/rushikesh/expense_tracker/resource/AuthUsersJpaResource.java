@@ -2,6 +2,7 @@ package com.rushikesh.expense_tracker.resource;
 
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,7 +76,7 @@ public class AuthUsersJpaResource {
 						userDetails.getUsername(),
 						userDetails.getEmail(),
 						roles,
-						jwtCookie.toString()));
+						jwtCookie.getValue()));
 	}
 
 	@PostMapping("/signup")
@@ -102,7 +103,7 @@ public class AuthUsersJpaResource {
 				signUpRequest.getEmail(),
 				encoder.encode(signUpRequest.getPassword()), null, null, null);
 
-		Set<String> strRoles = signUpRequest.getRoles();
+		List<String> strRoles = signUpRequest.getRoles();
 		Set<Roles> newRoles = new HashSet<>();
 		if (strRoles == null) {
 			Roles userRole = roleRepository.findByName(ConstantUtil.USER)
@@ -125,7 +126,9 @@ public class AuthUsersJpaResource {
 			});
 		}
 
-		user.setRoles(newRoles);
+		List<Roles> updatedRoles = new ArrayList<>(newRoles);
+
+		user.setRoles(updatedRoles);
 		userRepository.save(user);
 		response.setReturnObject(user);
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);

@@ -1,6 +1,5 @@
 package com.rushikesh.expense_tracker.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -8,7 +7,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.management.relation.Role;
+
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -23,10 +25,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -41,16 +45,16 @@ public class Users extends Audit implements UserDetails {
 	@Column(nullable = false)
 	private Long usersId;
 
-	@NotBlank
+	//	@NotBlank
 	@Column(name = "user_name", nullable = false)
 	private String username;
 
-	@NotBlank
+	//	@NotBlank
 	@Size(max = 50)
 	@Email
 	private String email;
 
-	@NotBlank
+	//	@NotBlank
 	@Size(max = 120)
 	@JsonIgnore
 	private String password;
@@ -59,24 +63,29 @@ public class Users extends Audit implements UserDetails {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 	@JsonIgnoreProperties("users")
 	@ElementCollection(targetClass=Accounts.class)
-	@JsonIgnore
-	private Collection<Accounts> accounts = new ArrayList<Accounts>();
+	//	@JsonIgnore
+	private List<Accounts> accounts;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 	@JsonIgnoreProperties("users")
 	@ElementCollection(targetClass=ExpensesType.class)
-	@JsonIgnore
-	private Collection<ExpensesType> expensesType = new ArrayList<ExpensesType>();
+	//	@JsonIgnore
+	private List<ExpensesType> expensesType;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private Set<Roles> roles = new HashSet<>();
+	@ManyToMany(cascade=CascadeType.MERGE)
+	@JsonIgnoreProperties("users")
+	@JoinTable(
+			name="users_roles",
+			joinColumns={@JoinColumn(name="users_id", referencedColumnName="usersId")},
+			inverseJoinColumns={@JoinColumn(name="roles_id", referencedColumnName="rolesId")})
+	private List<Roles> roles;
 
-	private Collection<? extends GrantedAuthority> authorities;
+
+	private List<? extends GrantedAuthority> authorities;
 
 
 	public Users(Long id,  String name, String email, String password,
-			Collection<Accounts> accounts, Collection<ExpensesType> expensesType, Collection<? extends GrantedAuthority> authorities) {
+			List<Accounts> accounts, List<ExpensesType> expensesType, List<? extends GrantedAuthority> authorities) {
 		super();
 		this.usersId = id;
 		this.username = name;
@@ -88,7 +97,8 @@ public class Users extends Audit implements UserDetails {
 	}
 
 	public static Users build(Users user) {
-		List<GrantedAuthority> authorities = user.getRoles().stream()
+		List<GrantedAuthority> authorities =  
+				user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName()))
 				.collect(Collectors.toList());
 
@@ -139,27 +149,27 @@ public class Users extends Audit implements UserDetails {
 		this.password = password;
 	}
 
-	public Collection<Accounts> getAccounts() {
+	public List<Accounts> getAccounts() {
 		return accounts;
 	}
 
-	public void setAccounts(Collection<Accounts> accounts) {
+	public void setAccounts(List<Accounts> accounts) {
 		this.accounts = accounts;
 	}
 
-	public Collection<ExpensesType> getExpensesType() {
+	public List<ExpensesType> getExpensesType() {
 		return expensesType;
 	}
 
-	public void setExpensesType(Collection<ExpensesType> expensesType) {
+	public void setExpensesType(List<ExpensesType> expensesType) {
 		this.expensesType = expensesType;
 	}
 
-	public  Set<Roles> getRoles() {
+	public  List<Roles> getRoles() {
 		return roles;
 	}
 
-	public void setRoles( Set<Roles> roles) {
+	public void setRoles(List<Roles> roles) {
 		this.roles = roles;
 	}
 
