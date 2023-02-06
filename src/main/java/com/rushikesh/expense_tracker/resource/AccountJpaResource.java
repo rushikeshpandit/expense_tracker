@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rushikesh.expense_tracker.constants.ConstantUtil;
+import com.rushikesh.expense_tracker.exception.AccountNotFoundException;
 import com.rushikesh.expense_tracker.exception.UserNotFoundException;
 import com.rushikesh.expense_tracker.model.Accounts;
 import com.rushikesh.expense_tracker.model.Users;
@@ -78,17 +79,18 @@ public class AccountJpaResource {
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
 
+		/// Handle Account not found		
+		Accounts fetchedAccount = user.get().getAccounts().stream()
+				.filter(account -> account.getId().longValue() == accounts.getId().longValue())
+				.findAny()
+				.orElse(null);
+		if(fetchedAccount == null)
+			throw new AccountNotFoundException("id:"+accounts.getId().longValue());
+
+		fetchedAccount.setName(accounts.getName());
+		accountRepository.save(fetchedAccount);
+
 		Collection<Accounts> existingAccounts = user.get().getAccounts();
-
-		existingAccounts.forEach(existingAccount -> {
-			if (existingAccount.getId().longValue() == accounts.getId().longValue()) {
-				existingAccount.setName(accounts.getName());
-			}
-		});
-
-		user.get().setAccounts(existingAccounts);
-
-		userRepository.save(user.get());
 
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
 		response.setReturnObject(existingAccounts);

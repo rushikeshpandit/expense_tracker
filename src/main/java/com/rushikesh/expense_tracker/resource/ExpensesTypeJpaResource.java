@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rushikesh.expense_tracker.constants.ConstantUtil;
+import com.rushikesh.expense_tracker.exception.ExpensesTypeNotFoundException;
 import com.rushikesh.expense_tracker.exception.UserNotFoundException;
 import com.rushikesh.expense_tracker.model.ExpensesType;
 import com.rushikesh.expense_tracker.model.Users;
@@ -40,7 +41,9 @@ public class ExpensesTypeJpaResource {
 
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
+
 		Collection<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
+
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
 		response.setReturnObject(existingExpensesTypes);
 		return ResponseEntity
@@ -77,18 +80,18 @@ public class ExpensesTypeJpaResource {
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
 
+		/// Handle Account not found		
+		ExpensesType fetchedExpensesTypes = user.get().getExpensesType().stream()
+				.filter(expensesType -> expensesType.getId().longValue() == expensesTypes.getId().longValue())
+				.findAny()
+				.orElse(null);
+		if(fetchedExpensesTypes == null)
+			throw new ExpensesTypeNotFoundException("id:"+expensesTypes.getId().longValue());
+
+		fetchedExpensesTypes.setExpenseTypeName(expensesTypes.getExpenseTypeName());
+		expensesTypeRepository.save(fetchedExpensesTypes);
+
 		Collection<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
-
-		existingExpensesTypes.forEach(existingExpensesType -> {
-			if (existingExpensesType.getId().longValue() == expensesTypes.getId().longValue()) {
-				existingExpensesType.setExpenseTypeName(expensesTypes.getExpenseTypeName());
-			}
-		});
-
-
-		user.get().setExpensesType(existingExpensesTypes);
-
-		userRepository.save(user.get());
 
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
 		response.setReturnObject(existingExpensesTypes);

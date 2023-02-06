@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,14 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rushikesh.expense_tracker.constants.ConstantUtil;
 import com.rushikesh.expense_tracker.exception.AccountNotFoundException;
-import com.rushikesh.expense_tracker.exception.ExpensesNotFoundException;
 import com.rushikesh.expense_tracker.exception.ExpensesTypeNotFoundException;
 import com.rushikesh.expense_tracker.exception.UserNotFoundException;
 import com.rushikesh.expense_tracker.model.Accounts;
 import com.rushikesh.expense_tracker.model.Expenses;
 import com.rushikesh.expense_tracker.model.ExpensesType;
 import com.rushikesh.expense_tracker.model.Users;
+import com.rushikesh.expense_tracker.payload.response.ServiceResponse;
 import com.rushikesh.expense_tracker.repository.AccountsRepository;
 import com.rushikesh.expense_tracker.repository.ExpensesRepository;
 import com.rushikesh.expense_tracker.repository.ExpensesTypeRepository;
@@ -41,58 +43,76 @@ public class ExpensesJpaResource {
 
 
 	@GetMapping("/users/{userId}/accounts/{accountId}/expenses")
-	public List<Expenses> retrieveExpenses(@PathVariable int userId, @PathVariable int accountId) {
+	public ResponseEntity<?> retrieveExpenses(@PathVariable int userId, @PathVariable int accountId) {
+		ServiceResponse response = new ServiceResponse();
+
 		Optional<Users> user = userRepository.findById(userId);
 
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
-
 
 		Optional<Accounts> fetchedAccount = accountsRepository.findById(accountId);
 
 		if(fetchedAccount.isEmpty())
 			throw new AccountNotFoundException("id:"+accountId);
 
-		Boolean shouldReturn = false;
+		/// Handle Account not found		
+		Accounts account = user.get().getAccounts().stream()
+				.filter(accounts -> accounts.getId().longValue() == accountId)
+				.findAny()
+				.orElse(null);
+		if(account == null)
+			throw new AccountNotFoundException("id:"+accountId); 
 
-		for(Accounts account: user.get().getAccounts()) {
-			if(account.getId().equals(fetchedAccount.get().getId())) {
-				shouldReturn = true;
-				break;
-			}
-		}
-		if (shouldReturn) {
-			return fetchedAccount.get().getExpenses();
-		} else {
-			throw new ExpensesNotFoundException("id:"+accountId);
-		}
+		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
+		response.setReturnObject(account.getExpenses());
+		return ResponseEntity
+				.ok()
+				.body(response);
 	}
 
 	@PostMapping("/users/{userId}/accounts/{accountId}/expenses/{expensesTypeId}")
-	public Expenses createExpense(@PathVariable int userId, @PathVariable int accountId, @PathVariable int expensesTypeId,
+	public ResponseEntity<?> createExpense(@PathVariable int userId, @PathVariable int accountId, @PathVariable int expensesTypeId,
 			@Valid @RequestBody Expenses expenses) {
-
+		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userId);
 
+		/// Handle User not found
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
 
-		Optional<Accounts> fetchedAccount = accountsRepository.findById(accountId);
+		/// Handle Account not found		
+		Accounts account = user.get().getAccounts().stream()
+				.filter(accounts -> accounts.getId().longValue() == accountId)
+				.findAny()
+				.orElse(null);
+		if(account == null)
+			throw new AccountNotFoundException("id:"+accountId); 
 
-		if(fetchedAccount.isEmpty())
-			throw new AccountNotFoundException("id:"+accountId);
 
-		Optional<ExpensesType> fetchedExpensesType = expensesTypeRepository.findById(expensesTypeId);
+		/// Handle Expenses Type not found
+		ExpensesType expensesType = user.get().getExpensesType().stream()
+				.filter(expensesTypes -> expensesTypes.getId().longValue() == expensesTypeId)
+				.findAny()
+				.orElse(null);
+		if(expensesType == null)
+			throw new ExpensesTypeNotFoundException("id:"+expensesTypeId); 
 
-		if(fetchedExpensesType.isEmpty())
-			throw new ExpensesTypeNotFoundException("id:"+expensesTypeId);
+		List<Expenses> existingExpenses = account.getExpenses();
 
+		expenses.setAccount(account);
+		expenses.setExpenseType(expensesType);
 		expenses.setUser(user.get());
-		expenses.setAccount(fetchedAccount.get());
-		expenses.setExpenseType(fetchedExpensesType.get());
 
-		Expenses savedExpenses = expensesRepository.save(expenses);
-		return savedExpenses;
+		existingExpenses.add(expenses);
+		expensesRepository.save(expenses);
+
+
+		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
+		response.setReturnObject(existingExpenses);
+		return ResponseEntity
+				.ok()
+				.body(response);
 	}
 
 }

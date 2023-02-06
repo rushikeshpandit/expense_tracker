@@ -56,13 +56,13 @@ public class Users extends Audit implements UserDetails {
 	private String password;
 
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 	@JsonIgnoreProperties("users")
 	@ElementCollection(targetClass=Accounts.class)
 	@JsonIgnore
 	private Collection<Accounts> accounts = new ArrayList<Accounts>();
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
 	@JsonIgnoreProperties("users")
 	@ElementCollection(targetClass=ExpensesType.class)
 	@JsonIgnore
