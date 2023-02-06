@@ -34,14 +34,18 @@ public class ExpensesTypeJpaResource {
 	private ExpensesTypeRepository expensesTypeRepository;
 
 	@GetMapping("/users/{userId}/expensestype")
-	public Collection<ExpensesType> retrieveExpensesTypes(@PathVariable int userId,
-			@PathVariable int expensesId) {
+	public ResponseEntity<?> retrieveExpensesTypes(@PathVariable int userId) {
+		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userId);
 
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+userId);
-
-		return user.get().getExpensesType();
+		Collection<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
+		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
+		response.setReturnObject(existingExpensesTypes);
+		return ResponseEntity
+				.ok()
+				.body(response);
 	}
 
 	@PostMapping("/users/{userId}/expensestype")
