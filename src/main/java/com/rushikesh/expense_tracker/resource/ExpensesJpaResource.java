@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -107,9 +108,53 @@ public class ExpensesJpaResource {
 		existingExpenses.add(expenses);
 		expensesRepository.save(expenses);
 
+		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
+		response.setReturnObject(existingExpenses);
+		return ResponseEntity
+				.ok()
+				.body(response);
+	}
+
+	@PutMapping("/users/{userId}/accounts/{accountId}/expenses/{expensesTypeId}")
+	public ResponseEntity<?> updateExpense(@PathVariable int userId, @PathVariable int accountId, @PathVariable int expensesTypeId,
+			@Valid @RequestBody Expenses expense) {
+
+		ServiceResponse response = new ServiceResponse();
+
+		Optional<Users> user = userRepository.findById(userId);
+
+		if(user.isEmpty())
+			throw new UserNotFoundException("id:"+userId);
+
+		/// Handle Account not found
+		Accounts account = user.get().getAccounts().stream()
+				.filter(accounts -> accounts.getId().longValue() == accountId)
+				.findAny()
+				.orElse(null);
+		if(account == null)
+			throw new AccountNotFoundException("id:"+accountId);
+
+		/// Handle Expenses Type not found
+		ExpensesType fetchedExpensesTypes = user.get().getExpensesType().stream()
+				.filter(expensesType -> expensesType.getId().longValue() == expensesTypeId)
+				.findAny()
+				.orElse(null);
+		if(fetchedExpensesTypes == null)
+			throw new ExpensesTypeNotFoundException("id:"+expense.getExpenseType().getId().longValue());
+		List<Expenses> existingExpenses = account.getExpenses();
+
+		existingExpenses.remove(expense);
+
+		expense.setAccount(account);
+		expense.setExpenseType(fetchedExpensesTypes);
+		expense.setUser(user.get());
+
+		existingExpenses.add(expense);
+		expensesRepository.save(expense);
 
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
 		response.setReturnObject(existingExpenses);
+
 		return ResponseEntity
 				.ok()
 				.body(response);
