@@ -8,11 +8,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rushikesh.expense_tracker.constants.ConstantUtil;
@@ -35,8 +35,8 @@ public class AccountJpaResource {
 	@Autowired
 	private AccountsRepository accountRepository;
 
-	@GetMapping("/users/{userId}/accounts")
-	public ResponseEntity<?> retrieveAccounts(@PathVariable int userId) {
+	@GetMapping("/users/accounts")
+	public ResponseEntity<?> retrieveAccounts(@RequestParam(value = "user") int userId) {
 		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userId);
 
