@@ -45,7 +45,7 @@ public class Expenses extends Audit {
 	@JsonIgnore
 	private ExpensesType expenseType;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 	@JoinColumn(name = "accounts_id", referencedColumnName = "accountId")
 	@JsonIgnoreProperties("expenses")
 	@JsonIgnore

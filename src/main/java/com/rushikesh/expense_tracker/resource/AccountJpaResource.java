@@ -1,7 +1,9 @@
 package com.rushikesh.expense_tracker.resource;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rushikesh.expense_tracker.constants.ConstantUtil;
-import com.rushikesh.expense_tracker.exception.AccountNotFoundException;
 import com.rushikesh.expense_tracker.exception.UserNotFoundException;
 import com.rushikesh.expense_tracker.model.Accounts;
 import com.rushikesh.expense_tracker.model.Users;
@@ -40,7 +41,7 @@ public class AccountJpaResource {
 		Optional<Users> user = userRepository.findById(userId);
 
 		if(user.isEmpty())
-			throw new UserNotFoundException("id:"+userId);
+			throw new UserNotFoundException("User with id:" + userId + " not cound");
 
 		Collection<Accounts> existingAccounts = user.get().getAccounts();
 
@@ -51,18 +52,22 @@ public class AccountJpaResource {
 				.body(response);
 	}
 
-	@PostMapping("/users/{userId}/accounts")
-	public ResponseEntity<?> createAccount(@PathVariable int userId, @Valid @RequestBody Accounts account) {
+	@PostMapping("/users/accounts")
+	public ResponseEntity<?> createAccount(@Valid @RequestBody Users userAccount) {
 		ServiceResponse response = new ServiceResponse();
-		Optional<Users> user = userRepository.findById(userId);
+		Optional<Users> user = userRepository.findById(userAccount.getId().intValue());
 		if(user.isEmpty())
-			throw new UserNotFoundException("id:"+userId);
-		account.setUser(user.get());
+			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not cound");
 
-		Collection<Accounts> existingAccounts = user.get().getAccounts(); 
-		existingAccounts.add(account);
+		List<Accounts> existingAccounts = user.get().getAccounts();
+		List<Accounts> accountsToBeAdded = userAccount.getAccounts();
 
-		accountRepository.save(account);
+		accountsToBeAdded.stream()
+		.forEach(account -> {
+			account.setUser(user.get());
+			existingAccounts.add(account);
+			accountRepository.save(account);
+		});
 
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
 		response.setReturnObject(existingAccounts);
@@ -71,26 +76,29 @@ public class AccountJpaResource {
 				.body(response);
 	}
 
-	@PutMapping("/users/{userId}/accounts")
-	public ResponseEntity<?> updateAccounts(@PathVariable int userId, @Valid @RequestBody Accounts accounts) {
+	@PutMapping("/users/accounts")
+	public ResponseEntity<?> updateAccounts(@Valid @RequestBody Users userAccount) {
 		ServiceResponse response = new ServiceResponse();
-		Optional<Users> user = userRepository.findById(userId);
-
+		Optional<Users> user = userRepository.findById(userAccount.getId().intValue());
 		if(user.isEmpty())
-			throw new UserNotFoundException("id:"+userId);
+			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not cound");
 
-		/// Handle Account not found		
-		Accounts fetchedAccount = user.get().getAccounts().stream()
-				.filter(account -> account.getId().longValue() == accounts.getId().longValue())
-				.findAny()
-				.orElse(null);
-		if(fetchedAccount == null)
-			throw new AccountNotFoundException("id:"+accounts.getId().longValue());
 
-		fetchedAccount.setName(accounts.getName());
-		accountRepository.save(fetchedAccount);
+		List<Accounts> existingAccounts = user.get().getAccounts();
+		List<Accounts> accountsToBeUpdated = userAccount.getAccounts();
+		List<Accounts> finalAccounts = new CopyOnWriteArrayList<Accounts>();
 
-		Collection<Accounts> existingAccounts = user.get().getAccounts();
+		existingAccounts.stream().forEach(existingAccount -> {
+			accountsToBeUpdated.stream().forEach(account -> {
+				if(existingAccount.getId().longValue() == account.getId().longValue()) {
+					existingAccount.setName(account.getName());
+				} 
+				finalAccounts.add(existingAccount);
+			});
+		});
+		finalAccounts.stream().forEach(finalAccount -> {
+			accountRepository.save(finalAccount);
+		});
 
 		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
 		response.setReturnObject(existingAccounts);

@@ -28,20 +28,21 @@ public class Accounts extends Audit {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(nullable = false)
 	private Long accountId;
 
 	@NotBlank
 	@Column(name = "account_name", nullable = false)
 	private String name;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
 	@JoinColumn(name = "users_id", referencedColumnName = "usersId")
 	@JsonIgnoreProperties("accounts")
 	@JsonIgnore
 	private Users user;
 
 	@ElementCollection(targetClass=Expenses.class)	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account", cascade = CascadeType.MERGE)
 	@JsonIgnoreProperties("account")
 	@JsonIgnore
 	private List<Expenses> expenses;

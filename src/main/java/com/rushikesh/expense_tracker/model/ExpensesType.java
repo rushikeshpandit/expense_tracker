@@ -31,7 +31,7 @@ public class ExpensesType extends Audit {
 	@Column(name = "expenses_type_name", nullable = false)
 	private String expenseTypeName;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
 	@JoinColumn(name = "users_id", referencedColumnName = "usersId")
 	@JsonIgnoreProperties("expensesType")
 	@JsonIgnore
