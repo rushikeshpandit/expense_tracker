@@ -40,9 +40,9 @@ public class Expenses extends Audit {
 	@JsonIgnore
 	private Users user;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "expense_type_id", nullable = false)
-	@JsonIgnore
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
 	private ExpensesType expenseType;
 
 	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
@@ -51,8 +51,13 @@ public class Expenses extends Audit {
 	@JsonIgnore
 	private Accounts account;
 
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "transaction_type_id", nullable = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private TransactionType transactionType;
+
 	public Expenses(Long id, String description, Long amount, @Valid Users user,
-			@Valid ExpensesType expenseType,@Valid Accounts account) {
+			@Valid ExpensesType expenseType,@Valid Accounts account, TransactionType transactionType) {
 		super();
 		this.expensesId = id;
 		this.description = description;
@@ -60,6 +65,8 @@ public class Expenses extends Audit {
 		this.user = user;
 		this.expenseType = expenseType;
 		this.account = account;
+		this.transactionType = transactionType;
+
 	}
 
 	public Long getId() {
@@ -110,4 +117,11 @@ public class Expenses extends Audit {
 		this.account = account;
 	}
 
+	public TransactionType getTransactionType() {
+		return transactionType;
+	}
+
+	public void setTransactionType(TransactionType transactionType) {
+		this.transactionType = transactionType;
+	}
 }

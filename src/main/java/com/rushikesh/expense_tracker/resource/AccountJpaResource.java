@@ -41,7 +41,7 @@ public class AccountJpaResource {
 		Optional<Users> user = userRepository.findById(userId);
 
 		if(user.isEmpty())
-			throw new UserNotFoundException("User with id:" + userId + " not cound");
+			throw new UserNotFoundException("User with id:" + userId + " not found");
 
 		Collection<Accounts> existingAccounts = user.get().getAccounts();
 
@@ -57,7 +57,7 @@ public class AccountJpaResource {
 		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userAccount.getId().intValue());
 		if(user.isEmpty())
-			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not cound");
+			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not found");
 
 		List<Accounts> existingAccounts = user.get().getAccounts();
 		List<Accounts> accountsToBeAdded = userAccount.getAccounts();
@@ -81,7 +81,7 @@ public class AccountJpaResource {
 		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userAccount.getId().intValue());
 		if(user.isEmpty())
-			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not cound");
+			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not found");
 
 
 		List<Accounts> existingAccounts = user.get().getAccounts();

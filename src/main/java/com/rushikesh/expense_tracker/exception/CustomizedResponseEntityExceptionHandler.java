@@ -61,6 +61,15 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 
 	}
 
+	@ExceptionHandler(TransactionTypeNotFoundException.class)
+	public final ResponseEntity<ErrorDetails> handleTransactionTypeNotFoundException(Exception ex, WebRequest request) throws Exception {
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 
+				ex.getMessage(), request.getDescription(false));
+
+		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
+
+	}
+
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {

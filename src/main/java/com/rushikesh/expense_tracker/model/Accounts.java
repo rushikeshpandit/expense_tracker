@@ -42,9 +42,8 @@ public class Accounts extends Audit {
 	private Users user;
 
 	@ElementCollection(targetClass=Expenses.class)	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account", cascade = CascadeType.MERGE)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "account", cascade = CascadeType.MERGE)
 	@JsonIgnoreProperties("account")
-	@JsonIgnore
 	private List<Expenses> expenses;
 
 	public Accounts(Long id, String name, Users user, List<Expenses> expenses) {

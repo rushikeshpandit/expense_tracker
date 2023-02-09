@@ -1,16 +1,11 @@
 package com.rushikesh.expense_tracker.model;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.management.relation.Role;
-
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -63,13 +58,11 @@ public class Users extends Audit implements UserDetails {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.MERGE)
 	@JsonIgnoreProperties("users")
 	@ElementCollection(targetClass=Accounts.class)
-	//	@JsonIgnore
 	private List<Accounts> accounts;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.MERGE)
 	@JsonIgnoreProperties("users")
 	@ElementCollection(targetClass=ExpensesType.class)
-	//	@JsonIgnore
 	private List<ExpensesType> expensesType;
 
 	@ManyToMany(cascade=CascadeType.MERGE)

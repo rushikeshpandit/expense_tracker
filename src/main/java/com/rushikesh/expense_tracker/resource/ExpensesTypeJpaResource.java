@@ -57,7 +57,7 @@ public class ExpensesTypeJpaResource {
 		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userAccount.getId().intValue());
 		if(user.isEmpty())
-			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not cound");
+			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not found");
 
 		List<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
 		List<ExpensesType> expensesTypesToBeAdded = userAccount.getExpensesType();
@@ -82,7 +82,7 @@ public class ExpensesTypeJpaResource {
 		ServiceResponse response = new ServiceResponse();
 		Optional<Users> user = userRepository.findById(userAccount.getId().intValue());
 		if(user.isEmpty())
-			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not cound");
+			throw new UserNotFoundException("User with id:" + userAccount.getId() + " not found");
 
 		List<ExpensesType> existingExpensesTypes = user.get().getExpensesType();
 		List<ExpensesType> expensesTypesToBeUpdated = userAccount.getExpensesType();
