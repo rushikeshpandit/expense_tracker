@@ -92,6 +92,7 @@ public class AccountJpaResource {
 			accountsToBeUpdated.stream().forEach(account -> {
 				if(existingAccount.getId().longValue() == account.getId().longValue()) {
 					existingAccount.setName(account.getName());
+					existingAccount.setBalance(account.getBalance());
 				} 
 				finalAccounts.add(existingAccount);
 			});

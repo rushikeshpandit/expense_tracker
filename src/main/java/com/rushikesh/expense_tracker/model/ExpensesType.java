@@ -1,6 +1,8 @@
 package com.rushikesh.expense_tracker.model;
 
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -17,6 +19,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
+@DynamicUpdate
 @Table(name = "expenses_type")
 public class ExpensesType extends Audit {
 

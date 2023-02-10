@@ -1,5 +1,7 @@
 package com.rushikesh.expense_tracker.model;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -18,6 +20,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 
 @Entity
+@DynamicUpdate
 @Table(name = "expenses")
 public class Expenses extends Audit {
 
@@ -43,6 +46,7 @@ public class Expenses extends Audit {
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "expense_type_id", nullable = false)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
+	@JsonIgnore
 	private ExpensesType expenseType;
 
 	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)

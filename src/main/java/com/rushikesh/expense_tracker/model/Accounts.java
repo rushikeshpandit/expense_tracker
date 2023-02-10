@@ -2,6 +2,8 @@ package com.rushikesh.expense_tracker.model;
 
 import java.util.List;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -20,6 +22,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
+@DynamicUpdate
 @Table(name = "accounts")
 public class Accounts extends Audit {
 
@@ -35,6 +38,9 @@ public class Accounts extends Audit {
 	@Column(name = "account_name", nullable = false)
 	private String name;
 
+	@Column(name = "balance", nullable = false)
+	private Long balance;
+
 	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
 	@JoinColumn(name = "users_id", referencedColumnName = "usersId")
 	@JsonIgnoreProperties("accounts")
@@ -46,12 +52,13 @@ public class Accounts extends Audit {
 	@JsonIgnoreProperties("account")
 	private List<Expenses> expenses;
 
-	public Accounts(Long id, String name, Users user, List<Expenses> expenses) {
+	public Accounts(Long id, String name, Long balance, Users user, List<Expenses> expenses) {
 		super();
 		this.accountId = id;
 		this.name = name;
 		this.user = user;
 		this.expenses = expenses;
+		this.balance = balance;
 	}
 
 	public Long getId() {
@@ -84,6 +91,14 @@ public class Accounts extends Audit {
 
 	public void setExpenses(List<Expenses> expenses) {
 		this.expenses = expenses;
+	}
+
+	public Long getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Long balance) {
+		this.balance = balance;
 	}
 
 }
