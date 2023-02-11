@@ -71,4 +71,11 @@ public class ExpensesType extends Audit {
 		this.user = user;
 	}
 
+//	public static ExpensesType build(ExpensesType expensesType) {
+//		return new ExpensesType(
+//				expensesType.getId(),
+//				expensesType.getExpenseTypeName(),
+//				expensesType.getUser());
+//	}
+
 }

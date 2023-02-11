@@ -242,35 +242,44 @@ public class ExpensesJpaResource {
 				.body(response);
 	}
 
-	@PostMapping("/users/transfer")
-	public ResponseEntity<?> accountTransfer(
-			@RequestParam(value = "account") int accountId,
-			@Valid @RequestBody Accounts userAccount) {
-		ServiceResponse response = new ServiceResponse();
-
-		Accounts accountToBeReplace = accountsRepository.findById(accountId).orElse(null);
-		Accounts finalAccount = accountsRepository.findById(userAccount.getId().intValue()).orElse(null);
-
-		if(accountToBeReplace == null)
-			throw new AccountNotFoundException("Account with id: " + accountId + " not found.");
-		if(finalAccount == null)
-			throw new AccountNotFoundException("Account with id: " + userAccount.getId() + " not found.");
-
-		Expenses expense = userAccount.getExpenses().get(0);
-
-		accountToBeReplace.setBalance(accountToBeReplace.getBalance().longValue() - expense.getAmount().longValue());
-		finalAccount.setBalance(finalAccount.getBalance().longValue() + expense.getAmount().longValue());
-		expense.setAccount(accountToBeReplace);
-
-		accountsRepository.save(accountToBeReplace);
-		accountsRepository.save(finalAccount);
-		expensesRepository.save(expense);
-
-		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
-		response.setReturnObject(finalAccount);
-		return ResponseEntity
-				.ok()
-				.body(response);
-
-	}
+//	@PostMapping("/users/transfer")
+//	public ResponseEntity<?> accountTransfer(
+//			@RequestParam(value = "account") int accountId,
+//			@Valid @RequestBody Accounts userAccount) {
+//		ServiceResponse response = new ServiceResponse();
+//
+//		Accounts accountToBeReplace = accountsRepository.findById(accountId).orElse(null);
+//		Accounts finalAccount = accountsRepository.findById(userAccount.getId().intValue()).orElse(null);
+//
+//		if(accountToBeReplace == null)
+//			throw new AccountNotFoundException("Account with id: " + accountId + " not found.");
+//		if(finalAccount == null)
+//			throw new AccountNotFoundException("Account with id: " + userAccount.getId() + " not found.");
+//
+//		Expenses expense = userAccount.getExpenses().get(0);
+//
+//		accountToBeReplace.setBalance(accountToBeReplace.getBalance().longValue() - expense.getAmount().longValue());
+//		finalAccount.setBalance(finalAccount.getBalance().longValue() + expense.getAmount().longValue());
+//		expense.setAccount(accountToBeReplace);
+//		expense.setExpenseType(findByExpenseTypeName("TRANSFER"));
+//		expense.getExpenseType().setUser(accountToBeReplace.getUser());
+//
+//		accountsRepository.save(accountToBeReplace);
+//		accountsRepository.save(finalAccount);
+//		expensesRepository.save(expense);
+//
+//		response.setStatus(ConstantUtil.RESPONSE_SUCCESS);
+//		response.setReturnObject(finalAccount);
+//		return ResponseEntity
+//				.ok()
+//				.body(response);
+//
+//	}
+	
+//	@Transactional
+//	public ExpensesType findByExpenseTypeName(String expenseTypeName) throws ExpensesTypeNotFoundException {
+//		ExpensesType type = expensesTypeRepository.findByExpenseTypeName(expenseTypeName);
+//
+//		return ExpensesType.build(type);
+//	}
 }
