@@ -12,6 +12,12 @@ repositories {
 	mavenCentral()
 }
 
+jar {
+	manifest {
+		attributes('Main-Class':'com.rushikesh.expense_tracker.ExpenseTrackerApplication')
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
