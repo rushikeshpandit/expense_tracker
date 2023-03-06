@@ -2,6 +2,7 @@ package com.rushikesh.expense_tracker.resource;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,9 +28,15 @@ public class UsersJpaResource implements UserDetailsService {
 	private UserRepository userRepository;
 
 	@GetMapping("/users")
-	public List<Users> GetUser() {
+	public List<Users> GetUsers() {
 		List<Users> allUsers = userRepository.findAll();
 		return allUsers;
+	}
+	
+	@GetMapping("/user/{id}")
+	public Users GetUser(@PathVariable int id) {
+		Optional<Users> user = userRepository.findById(id);
+		return user.get();
 	}
 
 	//	@PostMapping("/users")
